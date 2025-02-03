@@ -1,0 +1,1 @@
+# adFriend Browser extension
