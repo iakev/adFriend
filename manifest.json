@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "adFriend",
-  "version": "1.0.0",
-  "action": { "default_popup": "index.html" },
-  "host_permissions": ["<all_urls>"]
+  "name": "AdFriend Extension",
+  "version": "1.0",
+  "permissions": ["storage", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["https://api.api-ninjas.com/*"],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "icon.png"
+  }
 }
-
