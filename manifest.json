@@ -3,17 +3,24 @@
   "name": "adFriend",
   "version": "1.0.0",
   "action": { "default_popup": "index.html" },
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": ["activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["src/content.jsx"]
+      "js": ["src/content_scripts/main.jsx"]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content_scripts/iframe.jsx"],
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
+  "background": {
+    "service_worker": "src/background/background.js",
+    "type": "module"
+  },
   "web_accessible_resources": [
     {
       "resources": ["assets/*.svg"],
