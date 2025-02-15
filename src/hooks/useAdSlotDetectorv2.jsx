@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { createAdIconDetector, findIconsInElement, findIconPairsAndContainers } from "../utils/adDetectionUtils";
+import { createAdIconDetector, findIconsInElement } from "../utils/adDetectionUtils";
 
 function useAdSlotDetector() {
   const [detectedAdSlots, setDetectedAdSlots] = useState([]);
