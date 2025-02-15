@@ -1,8 +1,9 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
 import MotivationalQuoteWidget from './QuoteWidget';
-import DailyRemindersWidget from './RemindersWidget';
+import DailyRemindersWidget from './ReminderWidget';
 import JokesWidget from './JokesWidget';
-import ArtWidget from './ArtWidget';
+import ArtWidget from './ArtsWidget';
 import TodoWidget from './TodoWidget';
 import QuoteWidget from './QuoteWidget';
 

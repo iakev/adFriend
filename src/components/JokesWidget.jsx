@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from 'react';
 
 const JokesWidget = ({ adSlotId }) => {
@@ -30,22 +31,27 @@ const JokesWidget = ({ adSlotId }) => {
   };
 
   const loadStoredJoke = async () => {
-    try {
-      const result = await chrome.storage.local.get(storageKey);
-      const storedJoke = result[storageKey];
-      
-      // If no stored joke or joke is older than 24 hours, fetch new one
-      if (!storedJoke || Date.now() - storedJoke.timestamp > 24 * 60 * 60 * 1000) {
-        await fetchJoke();
-      } else {
-        setJoke(storedJoke);
-        setLoading(false);
-      }
-    } catch (err) {
-      setError('Failed to load stored joke');
+  try {
+    const storedJoke = JSON.parse(localStorage.getItem(storageKey));
+
+    console.log("Stored joke:", storedJoke); // Debugging log
+
+    // If no stored joke or joke is older than 24 hours, fetch a new one
+    if (!storedJoke || Date.now() - storedJoke.timestamp > 24 * 60 * 60 * 1000) {
+      console.log("Fetching a new joke...");
+      await fetchJoke();
+    } else {
+      console.log("Using stored joke...");
+      setJoke(storedJoke);
       setLoading(false);
     }
-  };
+  } catch (err) {
+    console.error("Error loading stored joke:", err); // Log error for debugging
+    setError('Failed to load stored joke');
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     loadStoredJoke();
@@ -69,5 +75,7 @@ const JokesWidget = ({ adSlotId }) => {
     </div>
   );
 };
+
+JokesWidget.widgetType = 'jokes';
 
 export default JokesWidget;
