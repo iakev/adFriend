@@ -1,27 +1,15 @@
-import { defineConfig } from "vite";
-import { viteStaticCopy } from 'vite-plugin-static-copy';
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { crx } from '@crxjs/vite-plugin'
+import manifest from './manifest.json'
 
 export default defineConfig({
   plugins: [
     react(),
-    viteStaticCopy({
-      targets: [{ src: 'manifest.json', dest: '' }], // Copy manifest.json to dist/
-    }),
+    crx({ manifest }),
   ],
-  test: {
-    environment: "jsdom",
-    globals: true,
-    setupFiles: ["./src/tests/setup.js"],
-    include: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
-    transformMode: {
-      web: [/\.[jt]sx$/]
-    }
+  legacy: {
+    skipWebSocketTokenCheck: true,
   },
-  resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.tsx']
-  },
-  server: {
-    cors: true,
-  },
-});
+})
+
