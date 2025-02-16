@@ -3,34 +3,41 @@ import React, { useState } from 'react';
 import MotivationalQuoteWidget from './QuoteWidget';
 import DailyRemindersWidget from './ReminderWidget';
 import JokesWidget from './JokesWidget';
-import ArtWidget from './ArtsWidget';
-import TodoWidget from './TodoWidget';
+//import ArtWidget from './ArtsWidget';
+//import TodoWidget from './TodoWidget';
 import QuoteWidget from './QuoteWidget';
 
-const WidgetContainer = ({ widgetType, adSlotId }) => {
+const WidgetContainer = ({ adSlotInfo }) => {
   const [isMinimized, setIsMinimized] = useState(false);
+  const width = adSlotInfo.rect.width;
+  const height = adSlotInfo.rect.height;
+  const adSlotId = adSlotInfo.id;
 
   // Widget configuration map
   const widgetComponents = {
     'quote': QuoteWidget,
-    'todo': TodoWidget,
+    //'todo': TodoWidget,
     'motivational': MotivationalQuoteWidget,
     'reminders': DailyRemindersWidget,
     'jokes': JokesWidget,
-    'art': ArtWidget
+    //'art': ArtWidget
   };
+
+  const widgetComponentsKeys = ['quote', 'motivational', 'reminders', 'jokes'];
 
   // Widget titles map
   const widgetTitles = {
     'quote': 'Quote of the Day',
-    'todo': 'Todo List',
+    //'todo': 'Todo List',
     'motivational': 'Motivational Quote',
     'reminders': 'Daily Reminders',
     'jokes': 'Daily Joke',
-    'art': 'Artistic Inspiration'
+    //'art': 'Artistic Inspiration'
   };
 
-  const SelectedWidget = widgetComponents[widgetType];
+  const index = Math.floor(Math.random() * widgetComponentsKeys.length);
+  const SelectedWidgetKey = widgetComponentsKeys[index];
+  const SelectedWidget = widgetComponents[SelectedWidgetKey];
 
   if (!SelectedWidget) {
     return <div className="p-4 text-red-500">Unknown widget type: {widgetType}</div>;
@@ -41,11 +48,14 @@ const WidgetContainer = ({ widgetType, adSlotId }) => {
   };
 
   return (
-    <div className="widget-container border rounded-lg shadow-sm bg-white overflow-hidden">
+    <div 
+      className="widget-container border rounded-lg shadow-sm bg-white overflow-hidden" 
+      style={{width, height}}
+    >
       {/* Widget Header */}
       <div className="widget-header flex justify-between items-center p-2 bg-gray-50 border-b">
         <h2 className="text-sm font-medium text-gray-700">
-          {widgetTitles[widgetType]}
+          {widgetTitles[SelectedWidgetKey]}
         </h2>
         <button
           onClick={toggleMinimize}
@@ -67,7 +77,7 @@ const WidgetContainer = ({ widgetType, adSlotId }) => {
       {/* Widget Content */}
       {!isMinimized && (
         <div className="widget-content">
-          <SelectedWidget adSlotId={adSlotId} />
+          <SelectedWidget adSlotId={adSlotId}/>
         </div>
       )}
     </div>
