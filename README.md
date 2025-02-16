@@ -16,8 +16,8 @@ A Chrome extension that intelligently detects and replaces ad spaces with useful
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ad-space-reimagined.git
-cd ad-space-reimagined
+git clone https://github.com/yourusername/adFriend.git
+cd adFriend
 ```
 
 2. Install dependencies:
