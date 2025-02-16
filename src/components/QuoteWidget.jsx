@@ -6,28 +6,43 @@ const QuoteWidget = () => {
   const [author, setAuthor] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const url = 'https://famous-quotes4.p.rapidapi.com/random?category=all&count=2';
+  const options = {
+    method: 'GET',
+    headers: {
+      'x-rapidapi-key': 'a7cdea77d7msh8687ccdc0fb77a9p1233e9jsn3728a938f700',
+      'x-rapidapi-host': 'famous-quotes4.p.rapidapi.com'
+    }
+  };
 
   const fetchQuote = async () => {
     try {
-      setIsLoading(true);
+      setIsRefreshing(true);
       setError(null);
       
-      const response = await fetch('https://zenquotes.io/api/quotes');
-      console.log("Quotes response:", response)
-      if (!response.ok) throw new Error('Failed to fetch quote');
-  
-      const data = await response.json();
-      setQuote(data.content);  // `content` should be `data.content`
-      setAuthor(data.author);  // `author` should be `data.author`
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        const advice  = await fetch('https://api.adviceslip.com/advice');
+        const result = await advice.json();
+        setQuote(result.slip.advice);
+        setAuthor(null);
+      } else {
+        const result = await response.json();
+        const randomQuote = result[Math.floor(Math.random() * 1)];
+        setQuote(randomQuote.text);
+        setAuthor(randomQuote.author);
+      }
   
     } catch (err) {
       setError('Failed to load quote. Please try again later.');
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
   
-
   useEffect(() => {
     fetchQuote();
   }, []);
@@ -43,25 +58,32 @@ const QuoteWidget = () => {
           {error}
         </div>
       ) : (
+      <div className="w-full max-w-sm mx-auto space-y-6">
         <div className="space-y-4">
-          <p className="text-lg font-medium" data-testid="quote-text">
-            "{quote}"
+          <p className="text-lg font-medium text-white/90 leading-relaxed" data-testid="quote-text">
+          "{quote}"
           </p>
-          <p className="text-sm text-gray-500 text-right" data-testid="quote-author">
-            - {author}
-          </p>
-          <button 
-            onClick={fetchQuote}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 w-full"
-          >
-            New Quote
-          </button>
+          {author &&(
+            <p className="text-sm text-white/70 text-right italic" data-testid="quote-author">
+              — {author}
+            </p>
+          )}
         </div>
-      )}
+      
+        <button 
+          onClick={fetchQuote}
+          disabled={isRefreshing}
+          className="w-full px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 
+                   transition-colors duration-200 text-white/90 text-sm
+                   flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          New Quote
+        </button>
+      </div>)}
     </div>
-  );
+ );
 };
-
 QuoteWidget.widgetType = 'quote';
 
 export default QuoteWidget;
+

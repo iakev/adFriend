@@ -80,23 +80,50 @@ const ReplacementAd = () => {
       }
     };
 
+      // Add gradient options
+    const gradients = [
+      'linear-gradient(45deg, #FF6B6B, #4ECDC4)',
+      'linear-gradient(45deg, #7F7FD5, #86A8E7, #91EAE4)',
+      'linear-gradient(45deg, #654ea3, #eaafc8)',
+      'linear-gradient(45deg, #00B4DB, #0083B0)',
+      'linear-gradient(45deg, #AD5389, #3C1053)',
+      'linear-gradient(45deg, #20002c, #cbb4d4)',
+      'linear-gradient(45deg, #2193b0, #6dd5ed)',
+      'linear-gradient(45deg, #C33764, #1D2671)',
+      'linear-gradient(45deg, #4568DC, #B06AB3)',
+      'linear-gradient(45deg, #0F2027, #203A43, #2C5364)'
+    ];
+
+    const getRandomGradient = () => {
+      return gradients[Math.floor(Math.random() * gradients.length)];
+    };
+
     const replaceAd = (adSlotInfo) => {
       const element = adSlotInfo.element;
       if (element) {
         try {
+          const existingMountPoint = element.querySelector('.replacement-widget');
+          if (existingMountPoint) {
+            console.warn("Removing existing widget before replacing...");
+            existingMountPoint.remove();
+          }
           // Clear the original content
           element.innerHTML = '';
           
           // Create a container for our React component
           const mountPoint = document.createElement('div');
+          mountPoint.className = 'replacement-widget';
           mountPoint.style.cssText = `
             padding: 10px;
-            border: 2px solid black;
-            text-align: center;
-            width: ${adSlotInfo.rect.width}px;
-            height: ${adSlotInfo.rect.height}px;
             position: relative;
-          `;
+            border-radius: 0.75rem;
+            background: ${getRandomGradient()};
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(8px);
+            overflow: hidden;
+            color: white;
+            transition: all 300ms ease-in-out;
+          `;         
           element.appendChild(mountPoint);
 
           // Create a new React root and render the WidgetContainer
@@ -113,9 +140,28 @@ const ReplacementAd = () => {
             </StrictMode>
           );
 
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === "childList") {
+                mutation.removedNodes.forEach((node) => {
+                  if (node === mountPoint) {
+                    console.warn("Ad slot modification detected! Restoring widget.");
+                    //Ensure not appending twice
+                    if (!element.querySelector('.replacement-widget')) {
+                      element.appendChild(mountPoint);
+                    }
+                  }
+                });
+              }
+            });
+          });
+
+          observer.observe(element, { childList: true });
+
           // Store cleanup function
           const cleanup = () => {
             try {
+              observer.disconnect();
               root.unmount();
               mountPoint.remove();
             } catch (error) {
@@ -127,10 +173,10 @@ const ReplacementAd = () => {
           element._cleanupWidget = cleanup;
           
           // Notify background script about replacement
-          chrome.runtime.sendMessage({
-            type: 'AD_REPLACED',
-            data: { adSlotInfo }
-          });
+//          chrome.runtime.sendMessage({
+//            type: 'AD_REPLACED',
+//            data: { adSlotInfo }
+//          });
         } catch (error) {
           console.error('Error replacing ad:', error);
         }

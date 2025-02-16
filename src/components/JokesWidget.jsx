@@ -5,7 +5,6 @@ const JokesWidget = ({ adSlotId }) => {
   const [joke, setJoke] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const storageKey = `joke-${adSlotId}`;
 
   const fetchJoke = async () => {
@@ -17,11 +16,11 @@ const JokesWidget = ({ adSlotId }) => {
       const jokeData = {
         setup: data.setup,
         delivery: data.delivery,
-        joke: data.joke, // for single-part jokes
+        joke: data.joke,
         timestamp: Date.now()
       };
       
-      await chrome.storage.local.set({ [storageKey]: jokeData });
+      localStorage.setItem(storageKey, JSON.stringify(jokeData));
       setJoke(jokeData);
       setLoading(false);
     } catch (err) {
@@ -30,30 +29,23 @@ const JokesWidget = ({ adSlotId }) => {
     }
   };
 
-  const loadStoredJoke = async () => {
-  try {
-    const storedJoke = JSON.parse(localStorage.getItem(storageKey));
-
-    console.log("Stored joke:", storedJoke); // Debugging log
-
-    // If no stored joke or joke is older than 24 hours, fetch a new one
-    if (!storedJoke || Date.now() - storedJoke.timestamp > 24 * 60 * 60 * 1000) {
-      console.log("Fetching a new joke...");
-      await fetchJoke();
-    } else {
-      console.log("Using stored joke...");
-      setJoke(storedJoke);
-      setLoading(false);
-    }
-  } catch (err) {
-    console.error("Error loading stored joke:", err); // Log error for debugging
-    setError('Failed to load stored joke');
-    setLoading(false);
-  }
-};
-
-
   useEffect(() => {
+    const loadStoredJoke = async () => {
+      try {
+        const storedJoke = JSON.parse(localStorage.getItem(storageKey));
+        if (!storedJoke || Date.now() - storedJoke.timestamp > 24 * 60 * 60 * 1000) {
+          await fetchJoke();
+        } else {
+          setJoke(storedJoke);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Error loading stored joke:", err);
+        setError('Failed to load stored joke');
+        setLoading(false);
+      }
+    };
+
     loadStoredJoke();
   }, [adSlotId]);
 
@@ -61,21 +53,22 @@ const JokesWidget = ({ adSlotId }) => {
   if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
+    <div className="w-full max-w-sm mx-auto space-y-4">
       {joke?.setup ? (
-        // Two-part joke
         <>
-          <p className="font-medium mb-2">{joke.setup}</p>
-          <p className="italic">{joke.delivery}</p>
+          <p className="text-lg font-medium text-white/90">{joke.setup}</p>
+          <p className="text-base italic text-white/80">{joke.delivery}</p>
         </>
       ) : (
-        // Single-part joke
-        <p className="font-medium">{joke.joke}</p>
+        <p className="text-lg font-medium text-white/90">{joke.joke}</p>
       )}
+      <div className="pt-4">
+        <span className="text-sm text-white/60">😆 Stay Laughing!</span>
+      </div>
     </div>
   );
 };
-
 JokesWidget.widgetType = 'jokes';
 
 export default JokesWidget;
+

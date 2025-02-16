@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import MotivationalQuoteWidget from './QuoteWidget';
 import DailyRemindersWidget from './ReminderWidget';
 import JokesWidget from './JokesWidget';
@@ -8,80 +8,64 @@ import JokesWidget from './JokesWidget';
 import QuoteWidget from './QuoteWidget';
 
 const WidgetContainer = ({ adSlotInfo }) => {
-  const [isMinimized, setIsMinimized] = useState(false);
-  const width = adSlotInfo.rect.width;
-  const height = adSlotInfo.rect.height;
-  const adSlotId = adSlotInfo.id;
+  const [gradient, setGradient] = useState('');
 
-  // Widget configuration map
+  // We'll only use the adSlotId from adSlotInfo and ignore the rect dimensions
+  const { id: adSlotId } = adSlotInfo;
+
+  const gradients = [
+    'bg-gradient-to-r from-purple-500/20 to-pink-500/20',
+    'bg-gradient-to-r from-blue-500/20 to-teal-500/20',
+    'bg-gradient-to-r from-orange-500/20 to-red-500/20',
+    'bg-gradient-to-r from-green-500/20 to-emerald-500/20'
+  ];
+
   const widgetComponents = {
     'quote': QuoteWidget,
-    //'todo': TodoWidget,
     'motivational': MotivationalQuoteWidget,
     'reminders': DailyRemindersWidget,
     'jokes': JokesWidget,
-    //'art': ArtWidget
   };
 
-  const widgetComponentsKeys = ['quote', 'motivational', 'reminders', 'jokes'];
-
-  // Widget titles map
   const widgetTitles = {
-    'quote': 'Quote of the Day',
-    //'todo': 'Todo List',
-    'motivational': 'Motivational Quote',
-    'reminders': 'Daily Reminders',
-    'jokes': 'Daily Joke',
-    //'art': 'Artistic Inspiration'
+    'quote': '📖 Quote of the Day',
+    'motivational': '💪 Motivational Quote',
+    'reminders': '📌 Daily Reminders',
+    'jokes': '🤣 Daily Joke',
   };
+
+  const widgetComponentsKeys = Object.keys(widgetComponents);
+
+  useEffect(() => {
+    setGradient(gradients[Math.floor(Math.random() * gradients.length)]);
+  }, []);
 
   const index = Math.floor(Math.random() * widgetComponentsKeys.length);
   const SelectedWidgetKey = widgetComponentsKeys[index];
   const SelectedWidget = widgetComponents[SelectedWidgetKey];
 
-  if (!SelectedWidget) {
-    return <div className="p-4 text-red-500">Unknown widget type: {widgetType}</div>;
-  }
-
-  const toggleMinimize = () => {
-    setIsMinimized(!isMinimized);
-  };
 
   return (
     <div 
-      className="widget-container border rounded-lg shadow-sm bg-white overflow-hidden" 
-      style={{width, height}}
+      className={`relative rounded-xl shadow-lg overflow-hidden
+                  transition-all duration-300 ease-in-out
+                  min-w-[280px] max-w-md w-fit
+                  bg-white/5 backdrop-blur-sm ${gradient}`}
     >
-      {/* Widget Header */}
-      <div className="widget-header flex justify-between items-center p-2 bg-gray-50 border-b">
-        <h2 className="text-sm font-medium text-gray-700">
+      {/* Header */}
+      <div className="flex justify-between items-center p-4 border-b border-white/10">
+        <h2 className="text-sm font-semibold text-white">
           {widgetTitles[SelectedWidgetKey]}
         </h2>
-        <button
-          onClick={toggleMinimize}
-          className="p-1 hover:bg-gray-200 rounded"
-          title={isMinimized ? 'Expand' : 'Minimize'}
-        >
-          {isMinimized ? (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          ) : (
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-          )}
-        </button>
       </div>
 
-      {/* Widget Content */}
-      {!isMinimized && (
-        <div className="widget-content">
-          <SelectedWidget adSlotId={adSlotId}/>
-        </div>
-      )}
+      {/* Content */}
+      <div className="p-4">
+        <SelectedWidget adSlotId={adSlotId} />
+      </div>
     </div>
   );
 };
 
 export default WidgetContainer;
+
