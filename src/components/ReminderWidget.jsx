@@ -48,25 +48,44 @@ const DailyRemindersWidget = ({ adSlotId }) => {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-3">Daily Reminders</h3>
-      <ul className="space-y-2">
+    <div className="w-full max-w-sm mx-auto">
+      <ul className="space-y-3 mb-4">
         {reminders.map(reminder => (
-          <li key={reminder.id} className="flex items-center">
-            <input
-              type="checkbox"
-              checked={reminder.completed}
-              onChange={() => toggleReminder(reminder.id)}
-              className="mr-2"
-            />
-            <span className={reminder.completed ? 'line-through text-gray-500' : ''}>
-              {reminder.text}
-            </span>
+          <li key={reminder.id}>
+            <label className="flex items-center group w-full px-4 py-2.5 rounded-lg 
+                            bg-white/5 hover:bg-white/10 transition-all duration-200 cursor-pointer">
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  checked={reminder.completed}
+                  onChange={() => toggleReminder(reminder.id)}
+                  className="w-5 h-5 border-2 border-white/60 rounded
+                            bg-transparent checked:bg-blue-500/80
+                            checked:border-transparent hover:border-white/90 
+                            focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-0 
+                            transition-all duration-200 cursor-pointer"
+                />
+              </div>
+              <span className={`ml-3 text-base ${
+                reminder.completed 
+                  ? 'text-white/50 line-through' 
+                  : 'text-white/90'
+              } transition-all duration-200`}>
+                {reminder.text}
+              </span>
+            </label>
           </li>
         ))}
       </ul>
+      
+      <div className="text-center">
+        <p className="text-sm text-white/70">
+          ✨ Make today count!
+        </p>
+      </div>
     </div>
   );
 };
 
 export default DailyRemindersWidget;
+

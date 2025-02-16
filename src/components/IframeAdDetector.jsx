@@ -17,7 +17,7 @@ function IframeAdDetector() {
             id: icon.icon.id
           })),
           iframeInfo: {
-            id: window.frameElement.id,
+            id: window?.frameElement?.id || null,
             href: window.location.href,
             origin: window.location.origin,
             size: {
@@ -33,16 +33,16 @@ function IframeAdDetector() {
           }
         }
       };
-      console.log('Iframe attempting to send Messsage:', message);
+      //console.log('Iframe attempting to send Messsage:', message);
       chrome.runtime.sendMessage(message, respone => {
         const error = chrome.runtime.lastError;
         if (error) {
           console.error('Error sending from iframe:', error);
         } else {
-          console.log('Succesfully sending from iframe, response', respone);
+          //console.log('Succesfully sending from iframe, response', respone);
         }
       });
-      console.log('Ad iframe detected with icons:', adIcons);
+      //console.log('Ad iframe detected with icons:', adIcons);
     } 
   }, [isAdFrame, adIcons]);
 

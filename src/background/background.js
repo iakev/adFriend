@@ -1,5 +1,11 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('message here:', message)
   if (message.type === 'IFRAME_AD_DETECTED') {
+    if (!sender.tab) {
+      console.error("No sender.tab found. Message ignored.");
+      return;
+    }
+
     // Store the frame data with a unique identifier
     const frameData = {
       frameId: sender.frameId,
@@ -14,14 +20,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       data: frameData
     });
 
-    // Optionally store the frame data for persistence
-//    chrome.storage.local.get(['adFrames'], (result) => {
-//      const adFrames = result.adFrames || {};
-//      const frameKey = `${sender.tab.id}-${sender.frameId}`;
-//      adFrames[frameKey] = frameData;
-//      
-//      chrome.storage.local.set({ adFrames });
-//    });
-  }
-});
+    sendResponse({ status: "success", message: "Iframe ad data forwarded" });
+  } 
 
+});
